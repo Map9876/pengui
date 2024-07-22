@@ -53,7 +53,7 @@ async def fetch_product_list(session, nonce, work_id, semaphore):
                 if isbns:
                     print("ISBNs found:")
                     for isbn in isbns:
-               #         print(isbn)
+                        print(isbn)
                     return isbns
                 else:
                     print("No ISBNs found in the response.")
