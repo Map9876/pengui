@@ -203,7 +203,6 @@ api.upload_folder(
 )
 
 # Publish Model Tokenizer on Hugging Face
-tokenizer.push_to_hub(model_repo_name)
 
 shutil.rmtree(image_directory)
 print(f"success")
