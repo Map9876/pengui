@@ -82,7 +82,7 @@ async def download_cover_image(session, isbn, semaphore):
         if response.status == 200:
             data = await response.read()
             with open(f"{image_directory}/{isbn}.tif.{today}", 'wb') as f:
-            print(f"ok")
+                print(f"ok")
                 f.write(data)
             return True
         else:
