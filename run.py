@@ -200,7 +200,7 @@ folder_path = image_directory
 api.upload_folder(
     folder_path=folder_path,
     repo_id=model_repo_name,
-    repo_type=dataset
+    repo_type="dataset"
 )
 
 # Publish Model Tokenizer on Hugging Face
