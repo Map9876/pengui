@@ -194,7 +194,6 @@ api = HfApi()
 model_repo_name = "haibaraconan/tif"  # Format of Input  <Profile Name > / <Model Repo Name> 
 
 #Create Repo in Hugging Face
-api.create_repo(repo_id=model_repo_name)
 folder_path = image_directory
 #Upload Model folder from Local to HuggingFace 
 api.upload_folder(
