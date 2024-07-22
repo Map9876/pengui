@@ -2,7 +2,7 @@ name: Action Practice
 
 
 on:
-  push:
+  
   schedule:
    - cron: "0 16 * * *"
   
