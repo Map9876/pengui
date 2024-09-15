@@ -155,8 +155,8 @@ async def main():
                 json.dump(data, f, indent=4)
                 print(f"dump to {data_file_path}")
             for isbn in changed_isbns:
-                file_count = len([f for f in os.listdir(image_directory) if f.startswith(isbn)])
-                if data[isbn][-1]['date'] == today and file_count < len(data[isbn]):
+    #            file_count = len([f for f in os.listdir(image_directory) if f.startswith(isbn)])
+     #           if data[isbn][-1]['date'] == today and file_count < len(data[isbn]):
                     await download_cover_image(session, isbn, semaphore)
 
             # 增加 start 值，准备下一次循环
