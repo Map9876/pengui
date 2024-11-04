@@ -189,7 +189,9 @@ subprocess.run(f'huggingface-cli login --token={os.environ["HF_TOKEN"]}',
                shell=True)
 
 from huggingface_hub import HfApi
+from huggingface_hub import list_repo_files
 
+"""
 api = HfApi()
 model_repo_name = "haibaraconan/tif"  # Format of Input  <Profile Name > / <Model Repo Name> 
 
@@ -203,6 +205,49 @@ api.upload_folder(
 )
 
 # Publish Model Tokenizer on Hugging Face
+"""
+
+from huggingface_hub import HfApi, list_repo_files
+import os
+import re
+
+def upload_folder_to_huggingface(folder_path, model_repo_name, repo_type="dataset"):
+    api = HfApi()
+    # 检查是否有txt文件，如果有，则读取内容作为path_in_repo参数
+    path_in_repo = ""
+    if os.path.exists("path_in_repo.txt"):
+        with open("path_in_repo.txt", "r") as file:
+            path_in_repo = file.read().strip()
+    
+    # 获取当前仓库的文件列表
+    files = api.list_repo_files(model_repo_name, repo_type=repo_type)
+    
+    # 计算以path_in_repo开头的文件数量，防止huggingface单个文件夹超过最大1万文件
+    count = sum(1 for file in files if file.startswith(path_in_repo))
+    
+    # 如果当前子目录下的文件数量超过9000，则更新path_in_repo
+    if count > 9000:
+        # 从path_in_repo中提取数字，并增加1
+        num = int(re.search(r"\d+", path_in_repo).group()) if path_in_repo else 0
+        new_path_in_repo = f"{num + 1}pengui/"
+        # 更新txt文件
+        with open("path_in_repo.txt", "w") as file:
+            file.write(new_path_in_repo)
+        path_in_repo = new_path_in_repo
+    
+    # 上传文件夹
+    api.upload_folder(
+        folder_path=folder_path,
+        repo_id=model_repo_name,
+        repo_type=repo_type,
+        path_in_repo=path_in_repo
+    )
+
+# 使用示例
+image_directory = image_directory
+model_repo_name = "haibaraconan/tif"  # Format of Input  <Profile Name > / <Model Repo Name> 
+upload_folder_to_huggingface(image_directory, model_repo_name)
+
 
 shutil.rmtree(image_directory)
 print(f"success")
