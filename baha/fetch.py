@@ -1,73 +1,90 @@
 """
-Fetch ani.gamer.com.tw page source via Playwright (bypasses CF challenge).
+Fetch ani.gamer.com.tw page source via FlareSolverr (bypasses CF challenge).
 Results are logged to README.md in this directory.
+
+Requires FlareSolverr running on localhost:8191.
 """
 
-import asyncio
+import json
 import os
 import sys
+import requests
 from datetime import datetime
-from playwright.async_api import async_playwright
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 README_PATH = os.path.join(SCRIPT_DIR, 'README.md')
 SOURCE_DIR = os.path.join(SCRIPT_DIR, 'source')
 
+FLARESOLVERR_URL = os.environ.get('FLARESOLVERR_URL', 'http://localhost:8191/v1')
+TARGET_URL = 'https://ani.gamer.com.tw/'
+
 today = datetime.now().strftime('%Y-%m-%d')
 now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 
-async def main():
+def fetch_via_flaresolverr():
+    """Send request to FlareSolverr and get solved page."""
+    print(f"[1/2] Sending request to FlareSolverr: {TARGET_URL}")
+    payload = {
+        "cmd": "request.get",
+        "url": TARGET_URL,
+        "maxTimeout": 60000,
+    }
+
+    try:
+        resp = requests.post(FLARESOLVERR_URL, json=payload, timeout=90)
+        data = resp.json()
+    except Exception as e:
+        return None, f"FlareSolverr error: {e}", None
+
+    if data.get('status') != 'ok':
+        return None, f"FlareSolverr status: {data.get('status')} - {data.get('message', '')}", None
+
+    solution = data.get('solution', {})
+    status = solution.get('status', 'unknown')
+    html = solution.get('response', '')
+    cookies = solution.get('cookies', [])
+    user_agent = solution.get('userAgent', '')
+
+    return html, status, {'cookies': cookies, 'user_agent': user_agent}
+
+
+def main():
     os.makedirs(SOURCE_DIR, exist_ok=True)
 
-    print("[1/3] Launching browser...")
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        context = await browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"
-        )
-        page = await context.new_page()
+    html, status, meta = fetch_via_flaresolverr()
 
-        print("[2/3] Navigating to ani.gamer.com.tw...")
-        try:
-            resp = await page.goto("https://ani.gamer.com.tw/", wait_until="domcontentloaded", timeout=30000)
-            status = resp.status if resp else "no response"
-        except Exception as e:
-            status = f"error: {e}"
-
-        # Wait for CF challenge
-        await page.wait_for_timeout(10000)
-
-        # Check if we got past CF
-        title = await page.title()
-        url = page.url
-        html = await page.content()
+    if html is None:
+        print(f"FAIL: {status}")
+        html = ""
+        html_len = 0
+        title = ""
+        cf_blocked = True
+    else:
         html_len = len(html)
+        # Extract title from HTML
+        import re
+        title_match = re.search(r'<title[^>]*>(.*?)</title>', html, re.IGNORECASE | re.DOTALL)
+        title = title_match.group(1).strip() if title_match else ""
+        cf_blocked = "challenge" in html[:3000].lower() or "just a moment" in title.lower()
 
-        # Check for CF challenge indicators
-        cf_blocked = "challenge" in html.lower()[:2000] or "just a moment" in title.lower()
+    print(f"[2/2] Result: status={status}, html={html_len:,} bytes, title={title[:60]}, cf_blocked={cf_blocked}")
 
-        print(f"[3/3] Result: status={status}, title={title[:80]}, html={html_len} bytes, cf_blocked={cf_blocked}")
+    # Save source
+    source_file = os.path.join(SOURCE_DIR, f"{today}.html")
+    with open(source_file, 'w', encoding='utf-8') as f:
+        f.write(html)
+    print(f"Source saved to {source_file}")
 
-        # Save source
-        source_file = os.path.join(SOURCE_DIR, f"{today}.html")
-        with open(source_file, 'w', encoding='utf-8') as f:
-            f.write(html)
-        print(f"Source saved to {source_file}")
-
-        # Extract some useful info from the page
-        try:
-            anime_items = await page.query_selector_all('.anime-card, .newanime, .theme-list-main-block, [class*="anime"]')
-            item_count = len(anime_items)
-        except Exception:
-            item_count = 0
-
-        await browser.close()
+    # Save cookies if available
+    if meta and meta.get('cookies'):
+        cookie_file = os.path.join(SOURCE_DIR, f"{today}_cookies.json")
+        with open(cookie_file, 'w') as f:
+            json.dump(meta['cookies'], f, indent=2)
 
     # Update README
     success = not cf_blocked and html_len > 5000
     status_icon = "PASS" if success else "FAIL"
-    # Clean status for table (single line)
     status_clean = str(status).split('\n')[0][:80]
     title_clean = title.replace('\n', ' ')[:50]
     entry = f"| {today} | {status_icon} | {status_clean} | {html_len:,} | {title_clean} |"
@@ -77,7 +94,7 @@ async def main():
     if success:
         print(f"SUCCESS: Got {html_len:,} bytes, title: {title[:60]}")
     else:
-        print(f"FAIL: CF blocked or empty page, {html_len:,} bytes, title: {title[:60]}")
+        print(f"FAIL: {html_len:,} bytes, title: {title[:60]}")
         sys.exit(1)
 
 
@@ -92,7 +109,7 @@ def update_readme(now_str, entry, success, status, html_len, title, source_file)
     if not content:
         content = """# ani.gamer.com.tw 抓取记录
 
-每日通过 GitHub Action 使用 Playwright 抓取 [ani.gamer.com.tw](https://ani.gamer.com.tw/) 源码，绕过 Cloudflare Challenge。
+每日通过 GitHub Action 使用 [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) 抓取 [ani.gamer.com.tw](https://ani.gamer.com.tw/) 源码，绕过 Cloudflare Challenge。
 
 ## 最新状态
 
@@ -139,4 +156,5 @@ def update_readme(now_str, entry, success, status, html_len, title, source_file)
         f.write(content)
 
 
-asyncio.run(main())
+if __name__ == '__main__':
+    main()

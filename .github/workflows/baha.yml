@@ -26,11 +26,18 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install Playwright
+      - name: Install dependencies
+        run: pip3 install requests
+
+      - name: Start FlareSolverr
         run: |
-          pip3 install playwright
-          playwright install chromium
-          playwright install-deps chromium
+          docker run -d --name flaresolverr \
+            -p 8191:8191 \
+            -e LOG_LEVEL=info \
+            ghcr.io/flaresolverr/flaresolverr:latest
+          echo "Waiting for FlareSolverr to start..."
+          sleep 15
+          curl -s http://localhost:8191/ || echo "FlareSolverr not ready yet"
 
       - name: Fetch ani.gamer.com.tw
         run: python3 ./baha/fetch.py
