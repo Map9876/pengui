@@ -52,6 +52,14 @@ jobs:
       - name: Compress covers to AVIF
         run: python3 ./compress.py
 
+      - name: Copy baha schedule to site
+        run: |
+          mkdir -p site/baha
+          cp baha/schedule.html site/baha/schedule.html 2>/dev/null || true
+          cp baha/schedule.json site/baha/schedule.json 2>/dev/null || true
+          cp baha/schedule.txt site/baha/schedule.txt 2>/dev/null || true
+          cp baha/README.md site/baha/README.md 2>/dev/null || true
+
       - name: Commit data updates
         env:
           GIT_NAME: GitHub Actions[Bot]
