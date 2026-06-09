@@ -93,6 +93,13 @@ def main():
 
     if success:
         print(f"SUCCESS: Got {html_len:,} bytes, title: {title[:60]}")
+        # Auto-build schedule
+        try:
+            import subprocess
+            subprocess.run([sys.executable, os.path.join(SCRIPT_DIR, 'build_schedule.py')], check=True)
+            print("Schedule built successfully")
+        except Exception as e:
+            print(f"Schedule build failed: {e}")
     else:
         print(f"FAIL: {html_len:,} bytes, title: {title[:60]}")
         sys.exit(1)
