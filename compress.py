@@ -84,7 +84,7 @@ def download_and_compress(isbn, target_date=None):
         return True
 
     # Download cover at higher resolution for quality
-    cover_url = f"https://images.penguinrandomhouse.com/cover/{isbn}?width={IMG_WIDTH * 2}"
+    cover_url = f"https://images2.penguinrandomhouse.com/cover/{isbn}"
     try:
         resp = requests.get(cover_url, timeout=30)
         if resp.status_code != 200:
