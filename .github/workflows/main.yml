@@ -74,8 +74,18 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
 
-      # Deploy to EdgeOne Pages (optional, requires EDGEONE_TOKEN secret)
-      - name: Deploy to EdgeOne Pages
-        if: ${{ secrets.EDGEONE_TOKEN != '' }}
-        run: npx edgeone pages deploy ./site --name pengui --token ${{ secrets.EDGEONE_TOKEN }}
+      # Push site to cnb.cool for EdgeOne Pages deployment
+      - name: Push to cnb.cool
+        env:
+          CNB_TOKEN: ${{ secrets.CNB_TOKEN }}
+        run: |
+          git clone https://cnb:${CNB_TOKEN}@cnb.cool/kfc50/penguin-edgeone-pages.git /tmp/cnb-repo
+          rm -rf /tmp/cnb-repo/*
+          cp -r ./site/* /tmp/cnb-repo/
+          cd /tmp/cnb-repo
+          git config user.name "GitHub Actions[Bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Update site at $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes"
+          git push origin master
         continue-on-error: true
