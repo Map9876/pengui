@@ -37,7 +37,7 @@ def extract_schedule(html):
 
 
 def build_html(schedule, updated):
-    """Build standalone HTML page."""
+    """Build standalone HTML page with light theme like itv6.jp."""
     # Build time slots (all unique times sorted)
     all_times = set()
     for entries in schedule.values():
@@ -56,20 +56,33 @@ def build_html(schedule, updated):
                 grid[t][day] = []
             grid[t][day].append(entry['name'])
 
+    # Current day and time for auto-scroll
+    now = datetime.now()
+    weekday_map = {0: '週一', 1: '週二', 2: '週三', 3: '週四', 4: '週五', 5: '週六', 6: '週日'}
+    today_day = weekday_map.get(now.weekday(), '')
+    now_time = now.strftime('%H:%M')
+    # Find closest time slot
+    closest_time = time_slots[0] if time_slots else '00:00'
+    for t in time_slots:
+        if t <= now_time:
+            closest_time = t
+    today_col_idx = DAYS.index(today_day) + 1 if today_day in DAYS else -1
+
     # Build table rows
     rows_html = ""
     for t in time_slots:
-        rows_html += f'<tr><td class="time-cell">{t}</td>'
+        is_current = (t == closest_time and today_day)
+        row_cls = ' class="current-row"' if is_current else ''
+        rows_html += f'<tr{row_cls} id="t{t.replace(":", "")}"><td class="time-cell">{t}</td>'
         for day in DAYS:
             anime_list = grid.get(t, {}).get(day, [])
             if anime_list:
                 names = '<br>'.join(f'<span class="anime-tag">{n}</span>' for n in anime_list)
-                rows_html += f'<td class="has-anime" style="border-left: 3px solid {DAY_COLORS[day]}">{names}</td>'
+                rows_html += f'<td class="has-anime">{names}</td>'
             else:
                 rows_html += '<td class="empty-cell"></td>'
         rows_html += '</tr>\n'
 
-    # Summary
     total = sum(len(v) for v in schedule.values())
     day_summary = ' | '.join(f'{d}: {len(schedule.get(d, []))}' for d in DAYS)
 
@@ -82,110 +95,139 @@ def build_html(schedule, updated):
 <style>
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
 body {{
-  font-family: "Microsoft JhengHei", "PingFang TC", -apple-system, sans-serif;
-  background: #1a1a2e;
-  color: #eee;
-  padding: 16px;
+  font-family: "Microsoft JhengHei", "PingFang TC", "Hiragino Kaku Gothic Pro", -apple-system, sans-serif;
+  background: #f5f5f5;
+  color: #333;
+  padding: 12px;
 }}
 h1 {{
   text-align: center;
-  font-size: 20px;
-  margin-bottom: 4px;
-  color: #fff;
+  font-size: 18px;
+  margin-bottom: 2px;
+  color: #222;
 }}
 .meta {{
   text-align: center;
-  font-size: 12px;
-  color: #888;
-  margin-bottom: 12px;
+  font-size: 11px;
+  color: #999;
+  margin-bottom: 8px;
 }}
 .summary {{
   text-align: center;
-  font-size: 13px;
-  color: #aaa;
-  margin-bottom: 16px;
-  padding: 8px;
-  background: #16213e;
-  border-radius: 6px;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 10px;
+  padding: 6px 12px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }}
-.summary b {{ color: #3498db; }}
+.summary b {{ color: #1a73e8; }}
 .table-wrap {{
-  overflow-x: auto;
+  overflow: auto;
   -webkit-overflow-scrolling: touch;
+  max-height: calc(100vh - 100px);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
 }}
 table {{
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
-  min-width: 700px;
+  font-size: 12px;
+  min-width: 650px;
 }}
 thead th {{
-  background: #16213e;
-  color: #fff;
-  padding: 8px 4px;
+  background: #fafafa;
+  color: #333;
+  padding: 6px 4px;
   position: sticky;
   top: 0;
   z-index: 10;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  border-bottom: 2px solid #333;
+  border-bottom: 2px solid #ccc;
 }}
-thead th.today {{
-  background: #e74c3c;
+thead th.today-col {{
+  background: #e8f0fe;
+  color: #1a73e8;
 }}
 .time-cell {{
-  background: #16213e;
-  color: #3498db;
-  font-weight: 700;
-  font-size: 14px;
-  padding: 6px 8px;
+  background: #fafafa;
+  color: #555;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 4px 6px;
   text-align: center;
   white-space: nowrap;
-  border-right: 2px solid #333;
+  border-right: 1px solid #ddd;
   position: sticky;
   left: 0;
   z-index: 5;
+  width: 45px;
+  min-width: 45px;
 }}
 td {{
-  padding: 4px 6px;
+  padding: 3px 5px;
   vertical-align: top;
-  border: 1px solid #2a2a4a;
-  min-width: 90px;
+  border: 1px solid #e8e8e8;
+  min-width: 80px;
 }}
 .has-anime {{
-  background: #16213e;
+  background: #fff;
+}}
+.has-anime.today-cell {{
+  background: #f0f7ff;
 }}
 .empty-cell {{
-  background: #111;
+  background: #fafafa;
 }}
 .anime-tag {{
   display: inline-block;
-  background: #0f3460;
-  color: #e0e0e0;
-  padding: 2px 6px;
-  margin: 2px 0;
-  border-radius: 3px;
-  font-size: 12px;
-  line-height: 1.4;
+  background: #f0f0f0;
+  color: #333;
+  padding: 1px 5px;
+  margin: 1px 0;
+  border-radius: 2px;
+  font-size: 11px;
+  line-height: 1.5;
+  border-left: 3px solid #1a73e8;
 }}
 .has-anime:hover {{
-  background: #1a3a6a;
+  background: #f5f5f5;
+}}
+.current-row {{
+  background: #fff8e1;
+}}
+.current-row .time-cell {{
+  background: #fff8e1;
+  color: #e65100;
+  font-weight: 700;
+}}
+.current-marker {{
+  display: inline-block;
+  background: #e65100;
+  color: #fff;
+  font-size: 9px;
+  padding: 0 4px;
+  border-radius: 2px;
+  margin-left: 4px;
+  vertical-align: middle;
 }}
 @media (max-width: 600px) {{
-  table {{ font-size: 11px; min-width: 600px; }}
-  .time-cell {{ font-size: 12px; padding: 4px; }}
-  .anime-tag {{ font-size: 10px; padding: 1px 4px; }}
+  table {{ font-size: 11px; min-width: 550px; }}
+  .time-cell {{ font-size: 11px; padding: 3px 4px; width: 40px; min-width: 40px; }}
+  .anime-tag {{ font-size: 10px; padding: 1px 3px; }}
 }}
 </style>
 </head>
 <body>
-<h1>巴哈姆特動畫瘋 新番時間表</h1>
+<h1>新番時間表</h1>
 <div class="meta">更新: {updated} | 來源: ani.gamer.com.tw</div>
 <div class="summary">
-  本季共 <b>{total}</b> 部番劇<br>
-  {day_summary}
+  本季共 <b>{total}</b> 部番劇 | {day_summary}
 </div>
-<div class="table-wrap">
+<div class="table-wrap" id="tableWrap">
 <table>
 <thead>
 <tr>
@@ -198,6 +240,17 @@ td {{
 </tbody>
 </table>
 </div>
+<script>
+// Auto-scroll to current time
+(function() {{
+  var wrap = document.getElementById('tableWrap');
+  var target = document.getElementById('t{closest_time.replace(":", "")}');
+  if (target && wrap) {{
+    var offset = target.offsetTop - wrap.offsetTop - 60;
+    wrap.scrollTop = Math.max(0, offset);
+  }}
+}})();
+</script>
 </body>
 </html>'''
 
