@@ -223,22 +223,29 @@ async def main():
             return
 
         # Step 4: Fetch MD5 for all ISBNs
-        print("Fetching cover MD5 hashes...")
-        semaphore = asyncio.Semaphore(100)
+        print(f"Fetching cover MD5 hashes for {len(all_isbns)} ISBNs...")
+        semaphore = asyncio.Semaphore(50)
         md5_tasks = [fetch_cover_md5(session, isbn, semaphore) for isbn in all_isbns]
         md5_results = await asyncio.gather(*md5_tasks)
-        print("MD5 fetch complete.")
+        md5_ok = sum(1 for m in md5_results if m is not None)
+        md5_fail = sum(1 for m in md5_results if m is None)
+        print(f"MD5 fetch complete: {md5_ok} ok, {md5_fail} failed")
 
         # Step 5: Update data and track changes
         changed_isbns = set()
+        new_isbns = 0
+        updated_isbns = 0
         for isbn, md5 in zip(all_isbns, md5_results):
             if md5:
                 if isbn not in data:
                     data[isbn] = [{'date': today, 'md5': md5}]
                     changed_isbns.add(isbn)
+                    new_isbns += 1
                 elif data[isbn][-1]['md5'] != md5:
                     data[isbn].append({'date': today, 'md5': md5})
                     changed_isbns.add(isbn)
+                    updated_isbns += 1
+        print(f"Data update: {new_isbns} new, {updated_isbns} changed, {len(changed_isbns)} total changed")
 
         # Save data
         with open(data_file_path, 'w') as f:
@@ -268,7 +275,7 @@ args = parser.parse_args()
 if args.token:
     import subprocess
     os.environ["HF_TOKEN"] = args.token
-    subprocess.run(f'huggingface-cli login --token={os.environ["HF_TOKEN"]}', shell=True)
+    subprocess.run(f'hf auth login --token={os.environ["HF_TOKEN"]}', shell=True)
 
     from huggingface_hub import HfApi
 
