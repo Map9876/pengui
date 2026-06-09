@@ -1,0 +1,48 @@
+name: Baha Fetch
+
+
+on:
+  schedule:
+    - cron: "0 18 * * *"
+  push:
+    paths:
+      - 'baha/**'
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python3
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Playwright
+        run: |
+          pip3 install playwright
+          playwright install chromium
+          playwright install-deps chromium
+
+      - name: Fetch ani.gamer.com.tw
+        run: python3 ./baha/fetch.py
+        continue-on-error: true
+
+      - name: Commit results
+        env:
+          GIT_NAME: GitHub Actions[Bot]
+          GIT_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+        run: |
+          git config --local user.name $GIT_NAME
+          git config --local user.email $GIT_EMAIL
+          git add baha/
+          git commit -m "baha: fetch at $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes"
+          git push
