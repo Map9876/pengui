@@ -15,8 +15,8 @@ data_file_path = 'data.json'
 image_directory = 'covers'
 
 
-async def get_cookies_from_browser():
-    """Use Playwright to visit the manga page, solve JS challenge, and extract cookies."""
+async def get_cookies_and_nonce():
+    """Use Playwright to solve JS challenge, extract cookies, and fetch nonce."""
     print("[1/3] Launching browser to bypass bot protection...")
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
@@ -29,7 +29,29 @@ async def get_cookies_from_browser():
         await page.goto("https://prhcomics.com/", wait_until="domcontentloaded", timeout=30000)
 
         # Wait for JS challenge to resolve
-        await page.wait_for_timeout(5000)
+        await page.wait_for_timeout(8000)
+
+        # Fetch nonce directly from the browser context (shares cookies)
+        print("[2/3] Fetching nonce via browser...")
+        nonce_resp = await context.request.get(
+            "https://prhcomics.com/wp/wp-admin/admin-ajax.php?action=get_nonce"
+        )
+        nonce_text = await nonce_resp.text()
+        print(f"[2/3] Nonce response: {nonce_text[:200]}")
+
+        if not nonce_text.startswith('{'):
+            # If we got a challenge page, wait longer and retry
+            print("[2/3] Got challenge page, waiting and retrying...")
+            await page.wait_for_timeout(5000)
+            nonce_resp = await context.request.get(
+                "https://prhcomics.com/wp/wp-admin/admin-ajax.php?action=get_nonce"
+            )
+            nonce_text = await nonce_resp.text()
+            print(f"[2/3] Retry nonce response: {nonce_text[:200]}")
+
+        nonce_data = json.loads(nonce_text)
+        nonce = nonce_data['nonce']
+        print(f"[2/3] Nonce: {nonce}")
 
         cookies = await context.cookies()
         print(f"[1/3] Got {len(cookies)} cookies from browser")
@@ -39,19 +61,7 @@ async def get_cookies_from_browser():
     cookie_dict = {}
     for c in cookies:
         cookie_dict[c['name']] = c['value']
-    return cookie_dict
-
-
-async def get_nonce(session):
-    """Fetch nonce via GET request."""
-    print("[2/3] Fetching nonce...")
-    url = 'https://prhcomics.com/wp/wp-admin/admin-ajax.php?action=get_nonce'
-    async with session.get(url) as response:
-        text = await response.text()
-        data = json.loads(text)
-        nonce = data['nonce']
-        print(f"[2/3] Nonce: {nonce}")
-        return nonce
+    return cookie_dict, nonce
 
 
 async def fetch_product_list(session, nonce, start, rows=36):
@@ -142,8 +152,8 @@ async def download_cover_image(session, isbn, semaphore):
 
 
 async def main():
-    # Step 1: Get cookies from browser
-    cookies = await get_cookies_from_browser()
+    # Step 1: Get cookies and nonce from browser
+    cookies, nonce = await get_cookies_and_nonce()
 
     if not os.path.exists(image_directory):
         os.makedirs(image_directory)
@@ -171,9 +181,6 @@ async def main():
     }
 
     async with aiohttp.ClientSession(cookies=cookie_morsel, headers=headers) as session:
-        # Step 2: Get nonce
-        nonce = await get_nonce(session)
-
         # Step 3: Fetch all ISBNs with pagination
         print("[3/3] Fetching all ISBNs...")
         all_isbns = []
