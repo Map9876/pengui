@@ -1,6 +1,7 @@
 import asyncio
 import json
 import hashlib
+import concurrent.futures
 from datetime import datetime
 from playwright.async_api import async_playwright
 import os
@@ -139,7 +140,7 @@ async def main():
             await browser.close()
             return
 
-        # Fetch MD5 for all ISBNs (images2 domain doesn't need prhcomics cookies)
+        # Fetch MD5 for all ISBNs (images2 domain doesn't need anti-bot)
         print(f"[4/4] Fetching cover MD5 hashes for {len(all_isbns)} ISBNs...")
 
         if not os.path.exists(image_directory):
@@ -151,23 +152,20 @@ async def main():
         else:
             data = {}
 
-        semaphore = asyncio.Semaphore(50)
         md5_results = [None] * len(all_isbns)
 
-        async def fetch_md5(idx, isbn):
-            async with semaphore:
-                try:
-                    resp = await context.request.get(
-                        f"https://images2.penguinrandomhouse.com/cover/{isbn}?height=1"
-                    )
-                    if resp.status == 200:
-                        body = await resp.body()
-                        md5_results[idx] = hashlib.md5(body).hexdigest()
-                except Exception:
-                    pass
+        def fetch_md5_sync(idx, isbn):
+            try:
+                r = requests.get(f"https://images2.penguinrandomhouse.com/cover/{isbn}?height=1", timeout=15)
+                if r.status_code == 200:
+                    md5_results[idx] = hashlib.md5(r.content).hexdigest()
+            except Exception:
+                pass
 
-        tasks = [fetch_md5(i, isbn) for i, isbn in enumerate(all_isbns)]
-        await asyncio.gather(*tasks)
+        import concurrent.futures
+        with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
+            futures = [executor.submit(fetch_md5_sync, i, isbn) for i, isbn in enumerate(all_isbns)]
+            concurrent.futures.wait(futures)
 
         md5_ok = sum(1 for m in md5_results if m is not None)
         md5_fail = sum(1 for m in md5_results if m is None)
@@ -194,24 +192,23 @@ async def main():
             json.dump(data, f, indent=4)
         print(f"Data saved to {data_file_path}")
 
-        # Download changed covers
+        # Download changed covers (images2 doesn't need anti-bot)
         if changed_isbns:
             print(f"Downloading {len(changed_isbns)} changed covers...")
-            async def download_cover(isbn):
-                async with semaphore:
-                    try:
-                        resp = await context.request.get(
-                            f"https://images2.penguinrandomhouse.com/cover/tif/{isbn}"
-                        )
-                        if resp.status == 200:
-                            body = await resp.body()
-                            file_path = os.path.join(image_directory, f"{isbn}.tif.{today}")
-                            with open(file_path, 'wb') as f:
-                                f.write(body)
-                    except Exception:
-                        pass
 
-            await asyncio.gather(*[download_cover(isbn) for isbn in changed_isbns])
+            def download_cover_sync(isbn):
+                try:
+                    r = requests.get(f"https://images2.penguinrandomhouse.com/cover/tif/{isbn}", timeout=30)
+                    if r.status_code == 200:
+                        file_path = os.path.join(image_directory, f"{isbn}.tif.{today}")
+                        with open(file_path, 'wb') as f:
+                            f.write(r.content)
+                except Exception:
+                    pass
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
+                futures = [executor.submit(download_cover_sync, isbn) for isbn in changed_isbns]
+                concurrent.futures.wait(futures)
             print("Cover download complete.")
         else:
             print("No changed covers to download.")

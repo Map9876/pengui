@@ -1,3 +1,4 @@
+<!-- /resume 6d0df6d8-8873-4f9e-9bfe-47999134577b penguin漫画下载 -->
 # pengui
 
 Penguin Random House Comics manga data tracker. Daily GitHub Action fetches all "Coming Soon" manga ISBNs from [prhcomics.com](https://prhcomics.com), computes MD5 of cover images to detect changes, and uploads covers to HuggingFace.
