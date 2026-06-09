@@ -4,14 +4,16 @@
 
 ## 最新状态
 
-**2026-06-10 00:15:31** — FAIL - CF 挑战未通过
-- HTTP Status: error: Page.goto: net::ERR_CONNECTION_RESET at https://ani.gamer.com.tw/
+**2026-06-10 00:17:20** — FAIL - CF 挑战未通过
+- HTTP Status: 403
+- 页面大小: 104,886 bytes
+- 标题: Just a moment...
+- 源码: [source/2026-06-10.html](source/2026-06-10.html)
+
+
 Call log:
   - navigating to "https://ani.gamer.com.tw/", waiting until "domcontentloaded"
 
-- 页面大小: 39 bytes
-- 标题: 
-- 源码: [source/2026-06-10.html](source/2026-06-10.html)
 
 
 (待更新)
