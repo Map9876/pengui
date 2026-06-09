@@ -1,0 +1,234 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #0d1117;
+  color: #e6edf3;
+  min-height: 100vh;
+}
+
+header {
+  text-align: center;
+  padding: 2rem 1rem 1rem;
+  border-bottom: 1px solid #30363d;
+}
+
+header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+header .subtitle {
+  color: #8b949e;
+  margin-top: 0.3rem;
+  font-size: 0.9rem;
+}
+
+main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  gap: 2rem;
+}
+
+/* Calendar */
+#calendar-section {
+  flex: 0 0 320px;
+  position: sticky;
+  top: 1rem;
+  align-self: flex-start;
+}
+
+#calendar {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.cal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.cal-header button {
+  background: none;
+  border: 1px solid #30363d;
+  color: #e6edf3;
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.cal-header button:hover {
+  background: #30363d;
+}
+
+.cal-header .cal-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.75rem;
+  color: #8b949e;
+  margin-bottom: 0.4rem;
+}
+
+.cal-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.cal-day {
+  text-align: center;
+  padding: 0.4rem 0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  position: relative;
+}
+
+.cal-day:hover {
+  background: #30363d;
+}
+
+.cal-day.today {
+  border: 1px solid #58a6ff;
+}
+
+.cal-day.selected {
+  background: #1f6feb;
+  color: #fff;
+}
+
+.cal-day.has-data::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #3fb950;
+}
+
+.cal-day.other-month {
+  color: #484f58;
+}
+
+/* Gallery */
+#gallery-section {
+  flex: 1;
+  min-width: 0;
+}
+
+#gallery-title {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.masonry {
+  column-count: 4;
+  column-gap: 12px;
+}
+
+.masonry .card {
+  break-inside: avoid;
+  margin-bottom: 12px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.masonry .card:hover {
+  border-color: #58a6ff;
+}
+
+.masonry .card img {
+  width: 100%;
+  display: block;
+  loading: lazy;
+}
+
+.masonry .card .info {
+  padding: 0.5rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+.masonry .card .info .isbn {
+  color: #58a6ff;
+  font-family: monospace;
+}
+
+.masonry .card .info .date {
+  color: #8b949e;
+  margin-top: 0.2rem;
+}
+
+.hidden {
+  display: none;
+}
+
+#loading {
+  text-align: center;
+  padding: 2rem;
+  color: #8b949e;
+}
+
+footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  border-top: 1px solid #30363d;
+  color: #8b949e;
+  font-size: 0.8rem;
+}
+
+footer a {
+  color: #58a6ff;
+  text-decoration: none;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .masonry {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 768px) {
+  main {
+    flex-direction: column;
+  }
+
+  #calendar-section {
+    position: static;
+    flex: none;
+  }
+
+  .masonry {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 480px) {
+  .masonry {
+    column-count: 1;
+  }
+}

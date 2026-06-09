@@ -1,4 +1,4 @@
-name: Action Practice
+name: Daily Update
 
 
 on:
@@ -12,38 +12,70 @@ env:
   TZ: Asia/Shanghai
 
 jobs:
-  # a single job
-  a-job-name:
+  update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
       - name: Set up Python3
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - name: Install requirements
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Python dependencies
         run: |
           python3 -m pip install --upgrade pip
-          pip3 install requests beautifulsoup4 lxml huggingface_hub asyncio aiohttp playwright
+          pip3 install requests pillow pillow-avif-plugin huggingface_hub asyncio aiohttp playwright
+
+      - name: Install Playwright
+        run: |
           playwright install chromium
           playwright install-deps chromium
-      - name: Run
+
+      - name: Fetch data and download covers
         run: python3 ./run.py --token ${{ secrets.TOKEN }}
 
+      - name: Compress covers to AVIF
+        run: python3 ./compress.py
 
-      - name: Commit
+      - name: Commit data updates
         env:
           GIT_NAME: GitHub Actions[Bot]
           GIT_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
-
         run: |
           git config --local user.name $GIT_NAME
           git config --local user.email $GIT_EMAIL
           git pull
-
-
           git reset --mixed master
-          git add .
-          git commit -m "Github action update at `date '+%Y-%m-%d %H:%M:%S'`."
+          git add data.json site/data.json site/img/
+          git commit -m "Github action update at `date '+%Y-%m-%d %H:%M:%S'`." || echo "No changes to commit"
           git push
+
+      # Deploy to GitHub Pages
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+
+      # Deploy to EdgeOne Pages (optional, requires EDGEONE_TOKEN secret)
+      - name: Deploy to EdgeOne Pages
+        if: ${{ secrets.EDGEONE_TOKEN != '' }}
+        run: npx edgeone pages deploy ./site --name pengui --token ${{ secrets.EDGEONE_TOKEN }}
+        continue-on-error: true
