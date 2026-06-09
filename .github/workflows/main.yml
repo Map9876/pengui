@@ -3,10 +3,10 @@ name: Action Practice
 
 on:
   push:
-  
+
   schedule:
    - cron: "0 16 * * *"
-  
+
 
 env:
   TZ: Asia/Shanghai
@@ -25,7 +25,9 @@ jobs:
       - name: Install requirements
         run: |
           python3 -m pip install --upgrade pip
-          pip3 install requests beautifulsoup4 lxml huggingface_hub asyncio aiohttp nest_asyncio
+          pip3 install requests beautifulsoup4 lxml huggingface_hub asyncio aiohttp playwright
+          playwright install chromium
+          playwright install-deps chromium
       - name: Run
         run: python3 ./run.py --token ${{ secrets.TOKEN }}
 
@@ -34,13 +36,13 @@ jobs:
         env:
           GIT_NAME: GitHub Actions[Bot]
           GIT_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
-        
+
         run: |
           git config --local user.name $GIT_NAME
           git config --local user.email $GIT_EMAIL
           git pull
-           
-          
+
+
           git reset --mixed master
           git add .
           git commit -m "Github action update at `date '+%Y-%m-%d %H:%M:%S'`."
