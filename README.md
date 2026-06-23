@@ -1,6 +1,12 @@
 <!-- /resume 6d0df6d8-8873-4f9e-9bfe-47999134577b penguin漫画下载 -->
 
-# pengui
+# penguinrandom-manga-cover-scraper
+
+所有漫画tiff封面文件储存在
+ https://huggingface.co/haibaraconan/tiff 仓库
+ 
+从 `2024-07-24 至 2025-08-03` 都有。
+然后由于原网站更新，代码没有维护，导致 `2025-08-03 - 2026-06-09` 大概10个月间没有爬到图片，之后恢复正常。后续考虑怎么用cnb.cool的ai api去每日定时看action日志自行维护，或者用github自带的ai维护
 
 **Gallery: https://map9876.github.io/pengui/**
 
