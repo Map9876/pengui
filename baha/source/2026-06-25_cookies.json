@@ -1,0 +1,62 @@
+[
+  {
+    "domain": ".gamer.com.tw",
+    "expiry": 1813435139,
+    "httpOnly": false,
+    "name": "ANIME_dark_theme",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": false,
+    "value": "0"
+  },
+  {
+    "domain": ".gamer.com.tw",
+    "expiry": 1782332936,
+    "httpOnly": true,
+    "name": "__cf_bm",
+    "path": "/",
+    "sameSite": "None",
+    "secure": true,
+    "value": ".boNtpSKgoQYAgoIkRuRXUG_Fu.OCrUzQaowzo2uHnI-1782331136.8005345-1.0.1.1-6z2Du3Hx7ph6xG9rmbvl_jqa5oOJS18CqqZozYG4mbGqqt43RryDnUy2Nwq8aSCKXVHQlXi7l6Yj.o2N56JfSmdZqlqG.z65U1N05xP3Qxb7nTp0EWIVKADE6hRxRRpu"
+  },
+  {
+    "domain": ".gamer.com.tw",
+    "expiry": 1813867136,
+    "httpOnly": true,
+    "name": "cf_clearance",
+    "path": "/",
+    "sameSite": "None",
+    "secure": true,
+    "value": "vVFcT8PdgrVtRUufnc04SBeO7tfFUMbrk__wYMjzfjY-1782331136-1.2.1.1-DyIXG7tjBXlvz3AYP.tWAWDtfYbrkmMaKbkfh2l7niiQj2pm4FlZ4MGYj6dGE8Ygg7tsduPyQA1BCY32tFfcy2wMEWp8kUKNybVOz.FlhHLg.4FRzD1CdtEmaXn3hoTqHtJh89d2nRUXyyN_HU9OYStKWoLn_v7hGkTPxm6_YCtyYaPmTspnEPL22bIpQnyQffTXsEdG3v_Udq0ius6jfqHVEUfsZdvZQUIrsSUOlm4Tjo3Ah2a2zdjQleXGPTdX9J1Y1wQmJFc5DJcsEtEFl_xinOyAFR1_A34SDzhLPDJvfuDmosqaQQXSd8k9AukBp6jjdurOrTCUtoyW0zGvIbS37odckclRBcPmWpAr3J5tv5ezkDId_49oBZV84NxhaUhZI68isU17RedSBDA_MMtum7QEw18pUkxFmISaHjXchT2O1Dpe6MDwMXXuJzjJskZY96oaOEMyHGgOu6mvdPbmskm5m9vjR1BagifKh.RmFTSpEvf9HrS2UNFVBhhZ"
+  },
+  {
+    "domain": ".gamer.com.tw",
+    "expiry": 1782345599,
+    "httpOnly": false,
+    "name": "ckBahaAd",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": false,
+    "value": "-------2-----------------"
+  },
+  {
+    "domain": ".gamer.com.tw",
+    "expiry": 1816891139,
+    "httpOnly": false,
+    "name": "_ga",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": false,
+    "value": "GA1.1.1676525548.1782331139"
+  },
+  {
+    "domain": ".gamer.com.tw",
+    "expiry": 1816891139,
+    "httpOnly": false,
+    "name": "_ga_MT7EZECMKQ",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": false,
+    "value": "GS2.1.s1782331139$o1$g0$t1782331139$j60$l0$h0"
+  }
+]
