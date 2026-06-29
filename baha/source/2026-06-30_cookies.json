@@ -1,0 +1,62 @@
+[
+  {
+    "domain": ".gamer.com.tw",
+    "expiry": 1813867800,
+    "httpOnly": false,
+    "name": "ANIME_dark_theme",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": false,
+    "value": "0"
+  },
+  {
+    "domain": ".gamer.com.tw",
+    "expiry": 1782765599,
+    "httpOnly": true,
+    "name": "__cf_bm",
+    "path": "/",
+    "sameSite": "None",
+    "secure": true,
+    "value": "1GVEgwmZHIc8KkNixWaSaPF4dXxzhQwIR0KO2aviHNs-1782763798.967111-1.0.1.1-la.13xu8saBRkFBc6S.hFpThUowx7rZVq2_gA03ugrBOz7vYqdycTmp.ir9MpmbBi5aNYF16ZCpM4URV75SPnQboZnxsdb25t5X1BZ49b_TRYQGrupCOWR4LOkZ85Rn1"
+  },
+  {
+    "domain": ".gamer.com.tw",
+    "expiry": 1814299799,
+    "httpOnly": true,
+    "name": "cf_clearance",
+    "path": "/",
+    "sameSite": "None",
+    "secure": true,
+    "value": "W6UTUUZdhpk7kYatx8pVe.ERFhyWZMmfqyHU3dl2IkE-1782763799-1.2.1.1-Wd81Mpef_41TG6g.uqd9ZawQ7kTVPCDYyGIBblVtAHw8oCkd3V_uzOe0zP_rxzBDFuSj7ef3UPJw6GIzNEWhb2iLy5ybsyXQRy12sTjJvFCOWG3yzOsY43chCVXOGSK_FKIWf5Q8KQZvYIFpwLpXV5rDvKIXWez5yUDOpnKxBM3RFyZKeO2QzfyyXaZucRKQ9bgmI8ZcOyF9UNEs4lWaHFhT2MAqWAGTwpK4EtA6OuHRUED1jwJ.e2N4UatM4KSRQn5jXH7bFFmt2hSDZiAqMYtI9nxLPutJxfEZlD_L6EE1TCmwJ5nRhUGkCDNmhnC6_sXRyiovKAQDRwx68A3T33hcFXE6bdRboKXWRziQ0EG6wePlLtQBVV1nHsMjoMpTp68Eny6qVW3qwSkkw.cnQErb4ok_7IXKZr0VzauNb43sdbWzkQO03HotUaZQ5qKWLs85iwowDn4Gruo0HeAovHbV_cLtx6aHwn5RpcoeLrojduG0gl2Bww7QvX8JeXhs"
+  },
+  {
+    "domain": ".gamer.com.tw",
+    "expiry": 1782777599,
+    "httpOnly": false,
+    "name": "ckBahaAd",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": false,
+    "value": "-------2-----------------"
+  },
+  {
+    "domain": ".gamer.com.tw",
+    "expiry": 1817323800,
+    "httpOnly": false,
+    "name": "_ga",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": false,
+    "value": "GA1.1.1380590620.1782763801"
+  },
+  {
+    "domain": ".gamer.com.tw",
+    "expiry": 1817323800,
+    "httpOnly": false,
+    "name": "_ga_MT7EZECMKQ",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": false,
+    "value": "GS2.1.s1782763800$o1$g0$t1782763800$j60$l0$h0"
+  }
+]
