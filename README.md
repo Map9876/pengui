@@ -149,5 +149,6 @@ X-Requested-With: XMLHttpRequest
 
 ## 相关项目
 
+- [Baha Anime Calendar](https://github.com/Map9876/baha-anime-calendar-chinese) — 巴哈姆特动画疯新番时间表，FlareSolverr 抓取 + bgm.tv 封面 + itv6.jp 复古风格 | [在线查看](https://map9876.github.io/baha-anime-calendar-chinese/)
 - 原项目: https://github.com/Map987/pengui
 - LNRelease: https://github.com/LNRelease/lnrelease.github.io
